@@ -1,0 +1,1 @@
+C:\Users\Doggy\Desktop\Rust\Rust\mygrep\target\package\mygrep-0.1.0\target\debug\mygrep.exe: C:\Users\Doggy\Desktop\Rust\Rust\mygrep\target\package\mygrep-0.1.0\src\lib.rs C:\Users\Doggy\Desktop\Rust\Rust\mygrep\target\package\mygrep-0.1.0\src\main.rs

@@ -1,0 +1,15 @@
+[package]
+name = "mygrep_hunter"
+version = "0.1.0"
+edition = "2021"
+description = "A learning project to search query in files."
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3
