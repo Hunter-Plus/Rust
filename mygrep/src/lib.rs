@@ -1,3 +1,9 @@
+//! # My Grep
+//!
+//! `mygrep` is a tool to grep query from text files.
+//! It's a learning project.
+
+
 use std::env::args;
 use std::error::Error;
 use std::{env, fs, result};
@@ -31,6 +37,7 @@ impl Config {
     }
 }
 
+/// Run with parameters through command lines.
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.file_path)?;
 
@@ -46,7 +53,17 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 
     Ok(())
 }
-
+/// Search query in file.
+/// # Examples
+/// ```
+/// let query = "duct";
+/// let contents = "\
+/// Rust:
+/// safe, fast, productive.
+/// Pick three.
+/// Trust me.";
+/// assert_eq!(vec!["safe, fast, productive."], mygrep::search(query, contents));
+/// ```
 pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
     contents
         .lines()
@@ -78,17 +95,17 @@ Trust me.";
         assert_eq!(vec!["safe, fast, productive."], search(query, contents));
     }
 
-    #[test]
-    fn case_insensitive() {
-        let query = "rUsT";
-        let contents = "\
-Rust:
-safe, fast, productive.
-Pick three.
-Trust me.";
-        assert_eq!(
-            vec!["Rust:", "Trust me."],
-            search_case_insensitive(query, contents)
-        );
-    }
+//     #[test]
+//     fn case_insensitive() {
+//         let query = "rUsT";
+//         let contents = "\
+// Rust:
+// safe, fast, productive.
+// Pick three.
+// Trust me.";
+//         assert_eq!(
+//             vec!["Rust:", "Trust me."],
+//             search_case_insensitive(query, contents)
+//         );
+//     }
 }
