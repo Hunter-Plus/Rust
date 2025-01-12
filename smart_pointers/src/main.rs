@@ -15,7 +15,7 @@ impl<T> MyBox<T> {
     }
 }
 
-use std::ops::Deref;
+use std::{cell::RefCell, ops::Deref};
 
 impl<T> Deref for MyBox<T> {
     type Target = T;
@@ -48,7 +48,25 @@ enum RcList {
 }
 
 use crate::RcList::{RcCons, RcNil};
-use std::rc::Rc;
+use std::rc::{Rc, Weak};
+
+// multiple owners
+#[derive(Debug)]
+enum RefList {
+    RefCons(Rc<RefCell<i32>>, Rc<RefList>),
+    RefNil,
+}
+
+use crate::RefList::{RefCons, RefNil};
+
+// using weak<T> to avoid reference cycle
+
+#[derive(Debug)]
+struct Node {
+    value: i32,
+    parent: RefCell<Weak<Node>>,
+    children: RefCell<Vec<Rc<Node>>>,
+}
 
 fn main() {
     let list = Cons(1, Box::new(Cons(2, Box::new(Cons(3, Box::new(Nil))))));
@@ -84,5 +102,67 @@ fn main() {
     println!(
         "count after cc goes out of scope = {}",
         Rc::strong_count(&aa)
+    );
+
+    let value = Rc::new(RefCell::new(5));
+
+    let aaa = Rc::new(RefCons(Rc::clone(&value), Rc::new(RefNil)));
+
+    let bbb = RefCons(Rc::new(RefCell::new(3)), Rc::clone(&aaa));
+
+    let ccc = RefCons(Rc::new(RefCell::new(4)), Rc::clone(&aaa));
+
+    *value.borrow_mut() += 10;
+
+    println!("aaa after = {aaa:?}");
+    println!("bbb after = {bbb:?}");
+    println!("ccc after = {ccc:?}");
+
+    // avoiding reference cycles
+
+    let leaf = Rc::new(Node {
+        value: 3,
+        parent: RefCell::new(Weak::new()),
+        children: RefCell::new(vec![]),
+    });
+    println!(
+        "leaf strong = {}, weak = {}",
+        Rc::strong_count(&leaf),
+        Rc::weak_count(&leaf),
+    );
+    println!(
+        "leaf parent when init = {:?}",
+        leaf.parent.borrow().upgrade()
+    );
+    {
+        let branch = Rc::new(Node {
+            value: 5,
+            parent: RefCell::new(Weak::new()),
+            children: RefCell::new(vec![Rc::clone(&leaf)]),
+        });
+
+        *leaf.parent.borrow_mut() = Rc::downgrade(&branch);
+        println!(
+            "leaf parent after assignment = {:?}",
+            leaf.parent.borrow().upgrade()
+        );
+        println!(
+            "branch strong = {}, weak = {}",
+            Rc::strong_count(&branch),
+            Rc::weak_count(&branch),
+        );
+
+        println!(
+            "leaf strong = {}, weak = {}",
+            Rc::strong_count(&leaf),
+            Rc::weak_count(&leaf),
+        );
+    }
+
+    println!("leaf parent = {:?}", leaf.parent.borrow().upgrade());
+    println!(
+        "leaf strong = {}, weak = {}",
+        Rc::strong_count(&leaf),
+        Rc::weak_count(&leaf),
     );
 }
