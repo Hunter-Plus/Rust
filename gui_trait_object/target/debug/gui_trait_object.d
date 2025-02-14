@@ -1,0 +1,1 @@
+C:\Users\Doggy\Desktop\Rust\Rust\gui_trait_object\target\debug\gui_trait_object.exe: C:\Users\Doggy\Desktop\Rust\Rust\gui_trait_object\src\lib.rs C:\Users\Doggy\Desktop\Rust\Rust\gui_trait_object\src\main.rs
